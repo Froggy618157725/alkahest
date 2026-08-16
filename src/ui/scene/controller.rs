@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use alkahest_render::{Renderer, camera::Camera};
+use alkahest_render::{Renderer, camera::Camera, util::math::Vec3Ext};
 use egui::{Response, Ui};
 use glam::{Quat, Vec2, Vec3};
 
@@ -127,23 +127,46 @@ impl CameraController {
 
                 let mut movement = Vec3::ZERO;
                 ui.input(|i| {
-                    if i.key_down(egui::Key::W) {
-                        movement += camera.forward();
-                    }
-                    if i.key_down(egui::Key::S) {
-                        movement -= camera.forward();
-                    }
-                    if i.key_down(egui::Key::A) {
-                        movement -= camera.right();
-                    }
-                    if i.key_down(egui::Key::D) {
-                        movement += camera.right();
-                    }
-                    if i.key_down(egui::Key::Q) {
-                        movement -= camera.up();
-                    }
-                    if i.key_down(egui::Key::E) {
-                        movement += camera.up();
+                    if i.modifiers.alt {
+                        // Absolute controls
+                        if i.key_down(egui::Key::W) {
+                            movement += camera.forward().flatten();
+                        }
+                        if i.key_down(egui::Key::S) {
+                            movement -= camera.forward().flatten();
+                        }
+                        if i.key_down(egui::Key::A) {
+                            movement -= camera.right().flatten();
+                        }
+                        if i.key_down(egui::Key::D) {
+                            movement += camera.right().flatten();
+                        }
+                        if i.key_down(egui::Key::Q) {
+                            movement -= Vec3::Z;
+                        }
+                        if i.key_down(egui::Key::E) {
+                            movement += Vec3::Z;
+                        }
+                    } else {
+                        //relatove contols
+                        if i.key_down(egui::Key::W) {
+                            movement += camera.forward();
+                        }
+                        if i.key_down(egui::Key::S) {
+                            movement -= camera.forward();
+                        }
+                        if i.key_down(egui::Key::A) {
+                            movement -= camera.right();
+                        }
+                        if i.key_down(egui::Key::D) {
+                            movement += camera.right();
+                        }
+                        if i.key_down(egui::Key::Q) {
+                            movement -= camera.up();
+                        }
+                        if i.key_down(egui::Key::E) {
+                            movement += camera.up();
+                        }
                     }
                     movement = movement.normalize_or(Vec3::ZERO);
                     if i.modifiers.ctrl {
