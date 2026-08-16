@@ -15,6 +15,7 @@ use crate::{
 };
 
 pub mod colors;
+pub mod destiny_icons;
 pub mod icons;
 mod scene;
 mod style;
@@ -78,6 +79,12 @@ impl Gui {
                 "../../assets/fonts/RobotoMono-Regular.ttf"
             ))),
         );
+
+        // Some of these collide, so to get access we unfortunately need them separately
+        let desting_symbols_font = egui::FontFamily::Name("DestinySymbols".into());
+        fonts
+            .families
+            .insert(desting_symbols_font.clone(), vec!["DestinySymbols".into()]);
 
         let mut add_with_icons = |family: egui::FontFamily, elements: &[&str]| {
             for (i, &element) in elements.iter().enumerate() {
