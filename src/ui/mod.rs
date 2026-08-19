@@ -16,6 +16,7 @@ use crate::{
 
 pub mod colors;
 pub mod destiny_icons;
+pub mod hotkeys;
 pub mod icons;
 mod scene;
 mod style;
@@ -258,6 +259,9 @@ impl Gui {
                         shared_state,
                     },
                 );
+            if let Some((_, active_tab)) = self.tree.find_active_focused() {
+                active_tab.process_hotkeys(ui);
+            }
         });
 
         for tab in self.added_nodes.drain(..) {

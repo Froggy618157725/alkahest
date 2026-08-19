@@ -62,6 +62,16 @@ impl Tab {
             Tab::TagLookup(_) => 0,
         }
     }
+
+    pub fn process_hotkeys(&mut self, ui: &mut egui::Ui) {
+        if ui.text_edit_focused() {
+            return;
+        }
+        match self {
+            Tab::Activity(tab) => tab.process_hotkeys(ui),
+            _ => (),
+        }
+    }
 }
 
 impl Display for Tab {
