@@ -40,14 +40,14 @@ fn control_description_two_layer(
             .strong()
             .append_to(
                 &mut job,
-                &ui.style(),
+                ui.style(),
                 egui::FontSelection::Default,
                 egui::Align::Center,
             );
 
         egui::RichText::new(layer2).size(24.0).strong().append_to(
             &mut job,
-            &ui.style(),
+            ui.style(),
             egui::FontSelection::Default,
             egui::Align::Center,
         );
@@ -101,19 +101,19 @@ impl ControlsTab {
                     control_description(
                         ui,
                         format!(
-                            "Alt + {ICON_UPPERCASE_W}/{ICON_UPPERCASE_S}/{ICON_UPPERCASE_A}/\
-                             {ICON_UPPERCASE_D}"
+                            "{ICON_ALT_LEFT}+{ICON_UPPERCASE_W}/{ICON_UPPERCASE_S}/\
+                             {ICON_UPPERCASE_A}/{ICON_UPPERCASE_D}"
                         ),
                         "Move Camera in Horizontal Plain",
                     );
 
                     control_description(
                         ui,
-                        format!("Alt + {ICON_UPPERCASE_Q}/{ICON_UPPERCASE_E}"),
+                        format!("{ICON_ALT_LEFT}+{ICON_UPPERCASE_Q}/{ICON_UPPERCASE_E}"),
                         "Move Camera Down/Up in Absolute Coordinates",
                     );
 
-                    control_description(ui, "Ctrl", "Decrease Movement speed");
+                    control_description(ui, ICON_CTRL_LEFT, "Decrease Movement speed");
 
                     control_description(
                         ui,
@@ -143,6 +143,12 @@ impl ControlsTab {
                         MOUSE_BLUE,
                         ICON_MOUSEWHEEL_DOWN,
                         "Decrease Movement speed multiplier",
+                    );
+
+                    control_description(
+                        ui,
+                        format!("{ICON_HOME} Home"),
+                        "Go to a random (default) spawn point",
                     );
 
                     // control_description(
@@ -199,7 +205,7 @@ impl ControlsTab {
 
                     // control_description(
                     //     ui,
-                    //     format("Alt + {ICON_UPPERCASE_H}"),
+                    //     format("{ICON_ALT_LEFT} + {ICON_UPPERCASE_H}"),
                     //     "Unhide All Objects"
                     // );
 
@@ -214,7 +220,7 @@ impl ControlsTab {
                     // control_description(
                     //     ui,
                     //     format(
-                    //         "Ctrl + {ICON_SHIFT_LEFT} Shift + {ICON_UPPERCASE_H}",
+                    //         "{ICON_CTRL_LEFT}+{ICON_SHIFT_LEFT} Shift +{ICON_UPPERCASE_H}",
                     //     ),
                     //     "Deselect All Objects"
                     // );
@@ -264,9 +270,17 @@ impl ControlsTab {
 
                     control_description(ui, ICON_UPPERCASE_I, "Swap to Previous Map");
 
-                    control_description(ui, "Page Up", "Swap to Previous Map in List");
+                    control_description(
+                        ui,
+                        format!("{ICON_PAGE_UP} Page Up"),
+                        "Swap to Previous Map in List",
+                    );
 
-                    control_description(ui, "Page Down", "Swap to Next Map in List");
+                    control_description(
+                        ui,
+                        format!("{ICON_PAGE_DOWN} Page Down"),
+                        "Swap to Next Map in List",
+                    );
 
                     // control_section_title(ui, "Route Editing");
 

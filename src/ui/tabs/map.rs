@@ -44,6 +44,10 @@ impl MapTab {
         })
     }
 
+    pub fn process_hotkeys(&mut self, ui: &mut egui::Ui) {
+        self.scene.process_hotkeys(ui);
+    }
+
     pub fn ui(&mut self, ui: &mut egui::Ui, egui_d3d11: &mut egui_d3d11::D3D11Renderer) {
         if let Some(map) = self.load_task.get() {
             match map {

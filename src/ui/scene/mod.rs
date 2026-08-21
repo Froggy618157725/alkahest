@@ -10,7 +10,10 @@ use std::{
     time::Instant,
 };
 
-use alkahest_data::tfx::{FeatureRendererSubscription, common::AxisAlignedBBox};
+use alkahest_data::{
+    map::SRespawnPoint,
+    tfx::{FeatureRendererSubscription, common::AxisAlignedBBox},
+};
 use alkahest_render::{
     Gpu, Renderer,
     camera::Camera,
@@ -46,6 +49,7 @@ use crate::world::audio::{s_start_all_audio_sources, s_update_audio_sources};
 use crate::{
     app::SharedState,
     ui::{
+        hotkeys::SHORTCUT_MAP_HOME,
         scene::controller::CameraController,
         util::{ExternalDataWidgetExt, UiExt},
     },
@@ -56,6 +60,7 @@ use crate::{
         s_update_object_channels,
         sequencer::{s_evaluate_global_channel_expressions, s_get_all_global_channel_ids},
         shadowmap::{s_extract_all_shadowmaps, s_submit_all_shadowmaps},
+        transform::Transform,
     },
 };
 
@@ -193,6 +198,44 @@ impl Scene {
 
     pub fn clear(&mut self) {
         self.world.clear();
+    }
+
+    pub fn goto_home(&mut self) {
+        let mut spawn_candidates = Vec::new();
+        for (_, (transform, respawn_point)) in
+            self.world.query::<(&Transform, &SRespawnPoint)>().iter()
+        {
+            spawn_candidates.push((
+                transform.translation,
+                transform.rotation,
+                respawn_point.unk20,
+            ));
+        }
+
+        // If there's any spawn points labeled 'default' (0x2ea8fb98), filter out the rest
+        if spawn_candidates
+            .iter()
+            .find(|(_, _, p)| *p == 0x2ea8fb98)
+            .is_some()
+        {
+            spawn_candidates.retain(|(_, _, p)| *p == 0x2ea8fb98);
+        }
+
+        if let Some((translation, rotation, hash)) = fastrand::choice(spawn_candidates) {
+            self.camera.position = translation + Vec3::Z * 2.0;
+            self.camera.rotation = rotation;
+            self.controller.set_yaw_pitch(self.camera.get_yaw_pitch());
+            info!(
+                "Spawning camera at {translation:?} {rotation:?} / {:?} (spawn point 0x{hash:X})",
+                self.camera.get_yaw_pitch()
+            );
+        }
+    }
+
+    pub fn process_hotkeys(&mut self, ui: &mut egui::Ui) {
+        if ui.input_mut(|i| i.consume_shortcut(&SHORTCUT_MAP_HOME)) {
+            self.goto_home();
+        }
     }
 
     pub fn show(&mut self, ui: &mut Ui, size: Vec2, egui_d3d11: &mut egui_d3d11::D3D11Renderer) {

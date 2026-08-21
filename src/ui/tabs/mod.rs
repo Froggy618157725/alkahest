@@ -73,6 +73,7 @@ impl Tab {
         }
         match self {
             Tab::Activity(tab) => tab.process_hotkeys(ui),
+            Tab::Map(tab) => tab.process_hotkeys(ui),
             _ => (),
         }
     }

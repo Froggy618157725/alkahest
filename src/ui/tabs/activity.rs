@@ -134,6 +134,17 @@ impl ActivityTab {
         {
             self.set_current_map(prev);
         }
+
+        let Some(map) = self.maps.get_mut(self.current_map_index) else {
+            return;
+        };
+        if matches!(map.poll_load(), ActivityLoadState::Loaded)
+            && let Some(world) = &mut map.world
+        {
+            std::mem::swap(world, &mut self.scene.world);
+            self.scene.process_hotkeys(ui);
+            std::mem::swap(&mut self.scene.world, world);
+        }
     }
 
     pub fn ui(&mut self, ui: &mut egui::Ui, egui_d3d11: &mut egui_d3d11::D3D11Renderer) {
