@@ -1,5 +1,6 @@
 pub mod activity;
 pub mod activity_list;
+pub mod controls;
 pub mod entity_list;
 pub mod home;
 pub mod map;
@@ -13,6 +14,7 @@ pub mod test_scene;
 
 use std::{fmt::Display, sync::Arc};
 
+use controls::ControlsTab;
 use egui::Margin;
 use egui_dock::{DockState, NodeIndex, SurfaceIndex, TabIndex};
 use entity_list::EntityListTab;
@@ -30,6 +32,7 @@ use crate::ui::tabs::{
 pub enum Tab {
     Home,
     Settings,
+    Controls,
     EntityList(Box<EntityListTab>),
     StaticList(Box<StaticListTab>),
     SequenceList(Box<SequenceListTab>),
@@ -51,6 +54,7 @@ impl Tab {
         match self {
             Tab::Home => 0,
             Tab::Settings => 0,
+            Tab::Controls => 0,
             Tab::EntityList(_) => 0,
             Tab::StaticList(_) => 0,
             Tab::SequenceList(_) => 0,
@@ -62,6 +66,17 @@ impl Tab {
             Tab::TagLookup(_) => 0,
         }
     }
+
+    pub fn process_hotkeys(&mut self, ui: &mut egui::Ui) {
+        if ui.text_edit_focused() {
+            return;
+        }
+        match self {
+            Tab::Activity(tab) => tab.process_hotkeys(ui),
+            Tab::Map(tab) => tab.process_hotkeys(ui),
+            _ => (),
+        }
+    }
 }
 
 impl Display for Tab {
@@ -69,6 +84,7 @@ impl Display for Tab {
         let s = match self {
             Tab::Settings => GoogleMaterialSymbols::Settings.to_string(),
             Tab::Home => format!("{} Home", GoogleMaterialSymbols::Home),
+            Tab::Controls => format!("{} Controls", GoogleMaterialSymbols::VideogameAsset),
             Tab::EntityList(_) => format!("{} Entities", GoogleMaterialSymbols::ChessPawn),
             Tab::StaticList(_) => format!("{} Statics", GoogleMaterialSymbols::Landscape),
             Tab::SequenceList(_) => format!("{} Sequences", GoogleMaterialSymbols::Theaters),
@@ -113,6 +129,9 @@ impl<'a> egui_dock::TabViewer for TabViewer<'a> {
                     }
                     Tab::Settings => {
                         SettingsTab::ui(ui, self.shared_state);
+                    }
+                    Tab::Controls => {
+                        ControlsTab::ui(ui);
                     }
                     Tab::EntityList(tab) => {
                         let res = tab.ui(ui, self.egui_d3d11);

@@ -15,6 +15,7 @@ use crate::{
     app::SharedState,
     task::Task,
     ui::{
+        hotkeys::{SHORTCUT_MAP_NEXT, SHORTCUT_MAP_PREV, SHORTCUT_MAP_SWAP},
         scene::{Scene, controller::CameraController},
         util::{DButton, UiExt},
     },
@@ -26,6 +27,7 @@ use crate::{
 pub struct ActivityTab {
     maps: Vec<ActivityMap>,
     current_map_index: usize,
+    previous_map_index: Option<usize>,
 
     pub tag: TagHash,
     pub name: String,
@@ -81,6 +83,7 @@ impl ActivityTab {
 
         Ok(Self {
             current_map_index,
+            previous_map_index: None,
             maps,
             tag,
             name: tab_name,
@@ -96,6 +99,54 @@ impl ActivityTab {
         })
     }
 
+    fn set_current_map(&mut self, index: usize) {
+        if !self.maps[index].is_valid {
+            return;
+        }
+        self.previous_map_index = Some(self.current_map_index);
+        self.current_map_index = index;
+        self.maps[self.current_map_index].start_load();
+    }
+
+    fn set_current_map_next(&mut self) {
+        if self.current_map_index + 1 < self.maps.len() {
+            self.set_current_map(self.current_map_index + 1);
+        }
+    }
+
+    fn set_current_map_prev(&mut self) {
+        if self.current_map_index > 0 && !self.maps.is_empty() {
+            self.set_current_map(self.current_map_index - 1);
+        }
+    }
+
+    pub fn process_hotkeys(&mut self, ui: &mut egui::Ui) {
+        if ui.input_mut(|i| i.consume_shortcut(&SHORTCUT_MAP_NEXT)) {
+            self.set_current_map_next();
+        }
+
+        if ui.input_mut(|i| i.consume_shortcut(&SHORTCUT_MAP_PREV)) {
+            self.set_current_map_prev();
+        }
+
+        if ui.input_mut(|i| i.consume_shortcut(&SHORTCUT_MAP_SWAP))
+            && let Some(prev) = self.previous_map_index
+        {
+            self.set_current_map(prev);
+        }
+
+        let Some(map) = self.maps.get_mut(self.current_map_index) else {
+            return;
+        };
+        if matches!(map.poll_load(), ActivityLoadState::Loaded)
+            && let Some(world) = &mut map.world
+        {
+            std::mem::swap(world, &mut self.scene.world);
+            self.scene.process_hotkeys(ui);
+            std::mem::swap(&mut self.scene.world, world);
+        }
+    }
+
     pub fn ui(&mut self, ui: &mut egui::Ui, egui_d3d11: &mut egui_d3d11::D3D11Renderer) {
         egui::Panel::left(format!("activity_{}_map_list", self.tag)).show(ui, |ui| {
             egui::ScrollArea::vertical()
@@ -107,6 +158,8 @@ impl ActivityTab {
                         FontId::new(20.0, egui::FontFamily::Name("Medium".into())),
                     );
                     ui.style_mut().wrap_mode = Some(egui::TextWrapMode::Extend);
+
+                    let mut map_index_to_load: Option<usize> = None;
                     for (i, map) in self.maps.iter_mut().enumerate() {
                         let state = map.poll_load();
 
@@ -139,10 +192,12 @@ impl ActivityTab {
                                 .ui(ui)
                                 .clicked()
                             {
-                                self.current_map_index = i;
-                                map.start_load();
+                                map_index_to_load = Some(i);
                             }
                         });
+                    }
+                    if let Some(index) = map_index_to_load {
+                        self.set_current_map(index);
                     }
                 });
         });

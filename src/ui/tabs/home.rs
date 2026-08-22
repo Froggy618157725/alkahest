@@ -89,6 +89,15 @@ impl HomeTab {
                     shared_state.clone(),
                 ))));
             }
+            if uis[0]
+                .d_button(format!(
+                    "{} Controls",
+                    GoogleMaterialSymbols::VideogameAsset
+                ))
+                .clicked()
+            {
+                result = TabResult::Open(Tab::Controls);
+            }
 
             // uis[1].heading("2D");
             // uis[1].add_space(4.0);

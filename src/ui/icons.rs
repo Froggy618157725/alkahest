@@ -19,6 +19,7 @@ pub mod director {
     include_icon!(STRIKE, "strike.svg");
     include_icon!(CINEMATIC, "cinematic.svg");
     include_icon!(UNKNOWN, "unknown.svg");
+    include_icon!(AMBIENT, "ambient.svg");
 }
 
 pub mod sequencer {

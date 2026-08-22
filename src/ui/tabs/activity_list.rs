@@ -39,6 +39,7 @@ impl ActivityListTab {
         let mut patrol_nodes = vec![];
         let mut exotic_nodes = vec![];
         let mut cinematic_nodes = vec![];
+        let mut ambient_nodes = vec![];
         let mut unknown_nodes = vec![];
 
         let mut all_nodes = HashMap::default();
@@ -65,10 +66,6 @@ impl ActivityListTab {
                     tag,
                 },
             );
-
-            if activity.ends_with("_ambient") {
-                continue;
-            }
 
             if destination.starts_with("crucible_") {
                 crucible_nodes
@@ -112,6 +109,9 @@ impl ActivityListTab {
                     }
                     Some(ActivityKind::Patrol) => {
                         patrol_nodes.push(leaf.clone());
+                    }
+                    Some(ActivityKind::Ambient) => {
+                        ambient_nodes.push(leaf.clone());
                     }
                     Some(ActivityKind::Exotic) => {
                         exotic_nodes.push(leaf.clone());
@@ -158,6 +158,7 @@ impl ActivityListTab {
         patrol_nodes.sort_by_key(|node| node.title().to_string());
         exotic_nodes.sort_by_key(|node| node.title().to_string());
         cinematic_nodes.sort_by_key(|node| node.title().to_string());
+        ambient_nodes.sort_by_key(|node| node.title().to_string());
         unknown_nodes.sort_by_key(|node| node.title().to_string());
 
         let mut all_nodes = all_nodes.into_values().collect_vec();
@@ -203,6 +204,10 @@ impl ActivityListTab {
                     ActivityTreeNode::Branch {
                         title: "Patrol".to_string(),
                         children: patrol_nodes,
+                    },
+                    ActivityTreeNode::Branch {
+                        title: "Ambient".to_string(),
+                        children: ambient_nodes,
                     },
                     ActivityTreeNode::Branch {
                         title: "Unsorted".to_string(),
@@ -432,9 +437,11 @@ impl ActivityTreeNode {
             v if v.contains("_mission") => ActivityKind::Mission,
             v if v.contains("freeroam") => ActivityKind::Patrol,
             "patrol" => ActivityKind::Patrol,
+            "ambient" => ActivityKind::Ambient,
             v if v.contains("_ls_a") || v.contains("_ls_b") || v.contains("_ls_c") => {
                 ActivityKind::LostSector
             }
+            v if v.ends_with("_ambient") => ActivityKind::Ambient,
             _ => return None,
         };
 
@@ -496,6 +503,7 @@ enum ActivityKind {
     Patrol,
     LostSector,
     Cinematic,
+    Ambient,
 }
 
 impl ActivityKind {
@@ -514,6 +522,7 @@ impl ActivityKind {
             ActivityKind::Quest => icons::director::QUEST,
             ActivityKind::Mission => icons::director::QUEST,
             ActivityKind::Cinematic => icons::director::CINEMATIC,
+            ActivityKind::Ambient => icons::director::AMBIENT,
         }
     }
 
@@ -531,6 +540,7 @@ impl ActivityKind {
             ActivityKind::Exotic => Color32::from_rgb(191, 153, 65),
             ActivityKind::Cinematic => Color32::from_rgb(140, 140, 140),
             ActivityKind::Quest | ActivityKind::Mission => Color32::from_rgb(38, 68, 127),
+            ActivityKind::Ambient => Color32::WHITE,
         }
     }
 }

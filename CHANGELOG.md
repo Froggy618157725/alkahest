@@ -30,6 +30,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## Unreleased / Rolling Release
 
+- Added Controls page
+- Added back alt modifier for absolute controls while moving camera
+- Added back map selection hotkeys for Activity selector
+- Added "Ambient" category under Activities
+- Added "Home" hotkey for map viewing to jump to a random default spawn
+
 ## 0.5.2 - 2025-02-11
 
 ### Changed
