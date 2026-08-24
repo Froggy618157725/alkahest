@@ -151,11 +151,7 @@ impl ControlsTab {
                         "Go to a random (default) spawn point",
                     );
 
-                    // control_description(
-                    //     ui,
-                    //     ICON_UPPERCASE_G,
-                    //     "Move Camera to Position of Gaze"
-                    // );
+                    control_description(ui, ICON_UPPERCASE_G, "Move Camera to Position of Gaze");
 
                     // control_section_title(ui, "Object Interactions");
 

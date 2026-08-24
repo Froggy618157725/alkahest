@@ -49,7 +49,7 @@ use crate::world::audio::{s_start_all_audio_sources, s_update_audio_sources};
 use crate::{
     app::SharedState,
     ui::{
-        hotkeys::SHORTCUT_MAP_HOME,
+        hotkeys::{SHORTCUT_GAZE, SHORTCUT_MAP_HOME},
         scene::controller::CameraController,
         util::{ExternalDataWidgetExt, UiExt},
     },
@@ -235,9 +235,42 @@ impl Scene {
         }
     }
 
+    pub fn get_distance_pos_to_gaze(&mut self) -> (f32, Vec3) {
+        if let ViewKind::Main(view) = &self.view.kind {
+            let d = self.renderer.read_depth_at_center(view);
+            let pos = self
+                .camera
+                .world_to_projective
+                .inverse()
+                .project_point3(Vec3::new(0.0, 0.0, d));
+            let distance = (pos - self.camera.position).length();
+            (distance, pos)
+        } else {
+            (
+                f32::INFINITY,
+                Vec3::new(f32::INFINITY, f32::INFINITY, f32::INFINITY),
+            )
+        }
+    }
+
+    pub fn goto_gaze(&mut self) {
+        let (distance, pos) = self.get_distance_pos_to_gaze();
+        if distance + 0.01 < self.camera.far {
+            self.tween = Some(Tween::new(
+                ease_out_exponential,
+                Some((self.camera.position, pos - self.camera.forward() * 10.0)),
+                None,
+                0.7,
+            ));
+        }
+    }
+
     pub fn process_hotkeys(&mut self, ui: &mut egui::Ui) {
         if ui.input_mut(|i| i.consume_shortcut(&SHORTCUT_MAP_HOME)) {
             self.goto_home();
+        }
+        if ui.input_mut(|i| i.consume_shortcut(&SHORTCUT_GAZE)) {
+            self.goto_gaze();
         }
     }
 

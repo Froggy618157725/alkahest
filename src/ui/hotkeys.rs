@@ -18,8 +18,8 @@
 // pub const SHORTCUT_FOCUS: egui::KeyboardShortcut =
 //     egui::KeyboardShortcut::new(egui::Modifiers::NONE, egui::Key::F);
 
-// pub const SHORTCUT_GAZE: egui::KeyboardShortcut =
-//     egui::KeyboardShortcut::new(egui::Modifiers::NONE, egui::Key::G);
+pub const SHORTCUT_GAZE: egui::KeyboardShortcut =
+    egui::KeyboardShortcut::new(egui::Modifiers::NONE, egui::Key::G);
 
 pub const SHORTCUT_MAP_SWAP: egui::KeyboardShortcut =
     egui::KeyboardShortcut::new(egui::Modifiers::NONE, egui::Key::I);
