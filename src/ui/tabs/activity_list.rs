@@ -420,6 +420,8 @@ impl ActivityTreeNode {
             | "mission_sarcophagus"
             | "mission_cormorant"
             | "mission_oblation" => ActivityKind::Exotic,
+            "hiveship_kingsfall" => ActivityKind::Raid,
+            v if v.ends_with("_ambient") => ActivityKind::Ambient,
             v if v.starts_with("crucible") => ActivityKind::Crucible,
             v if v.starts_with("raid") || v.contains("raid_") => ActivityKind::Raid,
             v if v.starts_with("iron_banner") => ActivityKind::IronBanner,
@@ -441,7 +443,6 @@ impl ActivityTreeNode {
             v if v.contains("_ls_a") || v.contains("_ls_b") || v.contains("_ls_c") => {
                 ActivityKind::LostSector
             }
-            v if v.ends_with("_ambient") => ActivityKind::Ambient,
             _ => return None,
         };
 

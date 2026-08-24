@@ -11,9 +11,7 @@ use alkahest_data::{
     tfx::sequencer::{NodeKind, SSequence, SSequenceNodeRef, SUnk808091f1Variant},
 };
 use anyhow::Result;
-use egui::{
-    Color32, FontId, RichText, TextStyle, Ui, Vec2, Widget, scroll_area::ScrollSource,
-};
+use egui::{Color32, FontId, RichText, TextStyle, Ui, Vec2, Widget, scroll_area::ScrollSource};
 use egui_ltreeview::{NodeBuilder, TreeView, TreeViewBuilder};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use tiger_parse::{PackageManagerExt, TigerReadable};
