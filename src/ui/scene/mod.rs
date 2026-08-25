@@ -61,6 +61,7 @@ use crate::{
         sequencer::{s_evaluate_global_channel_expressions, s_get_all_global_channel_ids},
         shadowmap::{s_extract_all_shadowmaps, s_submit_all_shadowmaps},
         transform::Transform,
+        tween::{Tween, ease_out_exponential, s_update_tweens},
     },
 };
 
@@ -69,6 +70,7 @@ pub struct Scene {
 
     renderer: Arc<Renderer>,
     pub camera: Camera,
+    pub tween: Option<Tween>,
     pub view: View,
     last_frame_time: Instant,
     start_time: Instant,
@@ -125,6 +127,7 @@ impl Scene {
             global_channels: renderer.externs.default_globals,
             renderer,
             camera,
+            tween: None,
             time_of_day: 1200.0,
             time_scale: 1.0,
             animate_time_of_day: true,
@@ -379,7 +382,14 @@ impl Scene {
             let size_pixels = size * ui.ctx().pixels_per_point();
             let resolution = (size_pixels.x as u32, size_pixels.y as u32);
 
-            self.controller.update(&mut self.camera, ui, &r, delta_time);
+            self.controller
+                .update(&mut self.camera, &mut self.tween, ui, &r, delta_time);
+            s_update_tweens(
+                &mut self.world,
+                &mut self.camera,
+                &mut self.tween,
+                delta_time,
+            );
 
             if r.dragged_by(egui::PointerButton::Middle) {
                 let delta_adjusted = r.drag_delta() / 4.0;
