@@ -225,6 +225,7 @@ impl Scene {
         }
 
         if let Some((translation, rotation, hash)) = fastrand::choice(spawn_candidates) {
+            self.tween = None;
             self.camera.position = translation + Vec3::Z * 2.0;
             self.camera.rotation = rotation;
             self.controller.set_yaw_pitch(self.camera.get_yaw_pitch());
