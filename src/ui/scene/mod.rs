@@ -1,5 +1,6 @@
 mod asset_viewer;
 pub mod controller;
+mod crosshair;
 mod surface_viewer;
 
 use std::{
@@ -49,8 +50,8 @@ use crate::world::audio::{s_start_all_audio_sources, s_update_audio_sources};
 use crate::{
     app::SharedState,
     ui::{
-        hotkeys::{SHORTCUT_GAZE, SHORTCUT_MAP_HOME},
-        scene::controller::CameraController,
+        hotkeys::{SHORTCUT_GAZE, SHORTCUT_MAP_HOME, SHORTCUT_TOGGLE_CROSSHAIR},
+        scene::{controller::CameraController, crosshair::draw_crosshair},
         util::{ExternalDataWidgetExt, UiExt},
     },
     world::{
@@ -82,6 +83,7 @@ pub struct Scene {
     pub render_mode: RenderMode,
     keep_settings_open: bool,
     lock_resolution: bool,
+    show_crosshair: bool,
 
     pub controller: CameraController,
 
@@ -135,6 +137,7 @@ impl Scene {
             render_mode: RenderMode::Shaded,
             keep_settings_open: false,
             lock_resolution: false,
+            show_crosshair: false,
             controller: CameraController::new_orbit(Vec3::ZERO, 2.5),
             surface,
             surface_srv,
@@ -273,6 +276,9 @@ impl Scene {
         if ui.input_mut(|i| i.consume_shortcut(&SHORTCUT_GAZE)) {
             self.goto_gaze();
         }
+        if ui.input_mut(|i| i.consume_shortcut(&SHORTCUT_TOGGLE_CROSSHAIR)) {
+            self.show_crosshair = !self.show_crosshair;
+        }
     }
 
     pub fn show(&mut self, ui: &mut Ui, size: Vec2, egui_d3d11: &mut egui_d3d11::D3D11Renderer) {
@@ -307,16 +313,20 @@ impl Scene {
         egui::CentralPanel::default().show(ui, |ui| {
             let panel_rect = ui.available_rect_before_wrap();
 
-            let r = ui
-                .image(SizedTexture {
-                    id: egui_d3d11.textures_mut().allocate_dx_temporary(
-                        self.surface_srv.clone(),
-                        None,
-                        false,
-                    ),
-                    size,
-                })
-                .interact(Sense::CLICK | Sense::DRAG | Sense::HOVER);
+            let im = ui.image(SizedTexture {
+                id: egui_d3d11.textures_mut().allocate_dx_temporary(
+                    self.surface_srv.clone(),
+                    None,
+                    false,
+                ),
+                size,
+            });
+
+            if self.show_crosshair {
+                draw_crosshair(ui, im.rect.center());
+            }
+
+            let r = im.interact(Sense::CLICK | Sense::DRAG | Sense::HOVER);
 
             if !ui.is_rect_visible(r.rect) {
                 return;
@@ -485,6 +495,14 @@ impl Scene {
             })
             .0
             .on_hover_text("Scene Settings");
+
+        if ui
+            .selectable_label(self.show_crosshair, GoogleMaterialSymbols::Add.to_string())
+            .on_hover_text("Toggle Crosshair")
+            .clicked()
+        {
+            self.show_crosshair = !self.show_crosshair;
+        }
 
         if matches!(self.controller, CameraController::Orbit { .. })
             && ui

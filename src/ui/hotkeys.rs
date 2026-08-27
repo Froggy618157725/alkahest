@@ -33,6 +33,9 @@ pub const SHORTCUT_MAP_NEXT: egui::KeyboardShortcut =
 pub const SHORTCUT_MAP_HOME: egui::KeyboardShortcut =
     egui::KeyboardShortcut::new(egui::Modifiers::NONE, egui::Key::Home);
 
+pub const SHORTCUT_TOGGLE_CROSSHAIR: egui::KeyboardShortcut =
+    egui::KeyboardShortcut::new(egui::Modifiers::NONE, egui::Key::C);
+
 // pub const SHORTCUT_ADD_ROUTE_NODE_NEXT: egui::KeyboardShortcut =
 //     egui::KeyboardShortcut::new(egui::Modifiers::NONE, egui::Key::Plus);
 
